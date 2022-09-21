@@ -65,11 +65,13 @@ const PostSchema = new Schema<IPost, PostModelType, {}, PostQueryHelpers>(
     {timestamps: true}
 );
 
-// Query Helpers
+// Query Helpers, use like Post.find().byName("John") / const post = Post.find({}) now post.byName
 PostSchema.query.byName = function (title: string): PostModelQuery {
     return this.find({title});
 };
 
 const Post = model<IPost, PostModelType>("Post", PostSchema);
+
+
 
 export {Post, PostStatus};

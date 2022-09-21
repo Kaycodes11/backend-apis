@@ -1,12 +1,11 @@
 import express, {
-  Application,
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
+    Application,
+    ErrorRequestHandler,
+    Request,
+    Response,
 } from "express";
-import { Server } from "http";
-import { config } from "dotenv";
+import {Server} from "http";
+import {config} from "dotenv";
 // import createHttpError from "http-errors";
 import AuthRoutes from "./routes/auth.route";
 import PostRoutes from "./routes/post.route";
@@ -19,8 +18,8 @@ import session from "express-session";
 import path from "path";
 import passport from "passport";
 import multer from "multer";
-import { LocalPassport } from "./strategies/localStrategy";
-import { JwtStrategy } from "./strategies/jwtStrategy";
+import {LocalPassport} from "./strategies/localStrategy";
+import {JwtStrategy} from "./strategies/jwtStrategy";
 
 const app: Application = express();
 const memoryStore = new session.MemoryStore();
@@ -29,20 +28,25 @@ database();
 
 const PORT = Number(process.env.PORT);
 
-app.use(express.json()); // to parse json from request
-app.use(express.urlencoded({ extended: true })); // basically parse url-encoded data
-app.use("/images", express.static(path.join(__dirname, "/images"))); // /images/filename
-app.use(cookieParser());
-// session store data at server & this data only accessible through api at frontend not within the browser like normal cookie
+// for parsing application/json
+app.use(express.json());
 
+// for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({extended: true}));
+
+app.use("/images", express.static(path.join(__dirname, "/images"))); // /images/filename
+
+app.use(cookieParser());
+
+// session store data at server & this data only accessible through api at frontend not within the browser like normal cookie
 // noinspection SpellCheckingInspection
 app.use(
-  session({
-    secret: "AGDSGDSGDSHGDFHFDHFDHDF",
-    resave: false,
-    saveUninitialized: false,
-    store: memoryStore,
-  })
+    session({
+        secret: "AGDSGDSGDSHGDFHFDHFDHDF",
+        resave: false,
+        saveUninitialized: false,
+        store: memoryStore,
+    })
 );
 
 app.use(passport.initialize());
@@ -52,21 +56,30 @@ LocalPassport();
 JwtStrategy();
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // store within src/images folder; use cb(null, "src/images") or cb(null, "/images")
-    cb(null, "src/images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body?.name || Date.now() + path.extname(file.originalname));
-  },
+    destination: (req, file, cb) => {
+        // store within src/images folder; use cb(null, "src/images") or cb(null, "/images")
+        cb(null, "src/images");
+    },
+    filename: (req, file, cb) => {
+        cb(null, req.body?.name || Date.now() + path.extname(file.originalname));
+    },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({storage: storage});
+
+// for parsing multipart/form-data
+// app.use(upload.array())
 
 app.post("/api/upload", upload.single("file"), (req, res) => {
-  console.log(req.file);
-  res.status(200).json("file has been uploaded");
+    console.log(req.file);
+    res.status(200).json("file has been uploaded");
 });
+
+app.post('/api/form', upload.none(), (req: Request, res: Response) => {
+    const formData = req.body;
+    console.log(formData);
+    res.sendStatus(200);
+})
 
 // app.get("/", (req: Request, res: Response, next: NextFunction): Response => {
 //     return res.status(200).json({message: "Homepage"});
@@ -90,17 +103,17 @@ app.use("/groceries", GroceryRoutes); // using session for these routes
 
 // error handler
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  res
-    .status(err.status || 500)
-    .json({ message: err.message || "server error" });
+    res
+        .status(err.status || 500)
+        .json({message: err.message || "server error"});
 };
 
 app.use(errorHandler);
 
 try {
-  const server: Server = app.listen(PORT, (): void => {
-    console.log(`server started on the ${PORT}`);
-  });
+    const server: Server = app.listen(PORT, (): void => {
+        console.log(`server started on the ${PORT}`);
+    });
 } catch (e: any) {
-  console.log(e.message);
+    console.log(e.message);
 }
