@@ -6,9 +6,10 @@ interface Project {
 }
 
 type ProjectModelType = Model<Project, ProjectQueryHelpers>;
-// Query helpers should return `Query<any, Document<DocType>> & ProjectQueryHelpers`
-// to enable chaining.
+
+// Query helpers should return `Query<any, Document<DocType>> & ProjectQueryHelpers` to enable chaining.
 type ProjectModelQuery = Query<any, HydratedDocument<Project>, ProjectQueryHelpers> & ProjectQueryHelpers;
+
 interface ProjectQueryHelpers {
     byName(this: ProjectModelQuery, name: string): ProjectModelQuery;
 }
@@ -17,6 +18,7 @@ const schema = new Schema<Project, ProjectModelType, {}, ProjectQueryHelpers>({
     name: { type: String, required: true },
     stars: { type: Number, required: true }
 });
+
 schema.query.byName = function(name: string): ProjectModelQuery {
     return this.find({ name: name });
 };
@@ -25,3 +27,6 @@ schema.query.byName = function(name: string): ProjectModelQuery {
 const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 
 export {ProjectModel};
+
+// Similar to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
+// ProjectModel.find().where('stars').gt(1000).byName('mongoose')

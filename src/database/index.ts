@@ -11,5 +11,3 @@ export default function database(): void {
 
 // https://thecodebarbarian.com/working-with-mongoose-in-typescript.html
 // https://mongoosejs.com/docs/typescript.html
-// https://www.youtube.com/results?search_query=node+typescript+auth0+
-// https://mongoosejs.com/docs/typescript/subdocuments.html

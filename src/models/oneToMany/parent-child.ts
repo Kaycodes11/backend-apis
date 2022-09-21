@@ -1,13 +1,10 @@
-import {model, Schema, Document, Types} from "mongoose";
+import {model, Schema} from "mongoose";
 
-// `Parent` represents the object as it is stored in MongoDB
 interface Parent {
-    child?: Types.ObjectId,
+    child?: Schema.Types.ObjectId,
     name?: string
 }
-
-
-
+// to allow to multiple children then child: [{type: Schema.Types.ObjectId, ref: 'Child'}]
 const ParentModel = model<Parent>('Parent', new Schema({
     child: {type: Schema.Types.ObjectId, ref: 'Child'},
     name: String
@@ -21,15 +18,15 @@ interface PopulatedParent {
     child: Child | null
 }
 
-
 const ChildModel = model<Child>('Child', new Schema({name: String}));
 
-// Populate with `Paths` generic `{ child: Child }` to override `child` path
-ParentModel.findOne({}).populate<{ child: Child }>('child').orFail().then(doc => {
-    const t: string = doc.child.name;
-});
+// ParentModel.findOne({}).populate<{ child: Child }>('child').orFail().then(doc => {
+//     const t: string = doc.child.name;
+// });
 
 // same thing using Pick<>
-ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail().then(doc => {
-    const t: string = doc?.child?.name!;
-});
+// ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail().then(doc => {
+//     const t: string = doc?.child?.name!;
+// });
+
+export {ParentModel, ChildModel, Child, Parent};

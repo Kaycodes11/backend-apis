@@ -1,4 +1,4 @@
-import {Schema, model, Model, HydratedDocument} from "mongoose";
+import {Schema, model, Model, HydratedDocument, Query} from "mongoose";
 import bcrypt from 'bcrypt';
 
 interface Meta {
@@ -50,6 +50,7 @@ UserSchema.methods.comparePass = async function (rawPassword: string): Promise<b
     return await bcrypt.compare(rawPassword, this.password);
 };
 
+// UserSchema.pre<IUser> will only provide properties/methods from IUser whereas UserSchema will provide all props/methods from mongoose.Schema
 UserSchema.pre("save", async function (next) {
     if (this.isModified("password")) this.password = await bcrypt.hash(this.password, 12);
     next();
@@ -65,7 +66,6 @@ UserSchema.static('createWithFullName', function createWithFullName(name: string
 UserSchema.method('fullName', function (): string {
     return `${this.firstName} ${this.surName}`;
 });
-
 
 // what data this User model should have : User<IUser>
 const User = model<IUser, UserModel>("User", UserSchema);
