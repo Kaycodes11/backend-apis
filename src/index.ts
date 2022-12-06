@@ -13,7 +13,7 @@ const app: Application = express();
 
 config();
 
-const PORT = Number(process.env.PORT);
+const PORT = Number(process.env.PORT) || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
