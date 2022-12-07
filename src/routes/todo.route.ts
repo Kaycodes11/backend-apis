@@ -5,6 +5,8 @@ const router = Router();
 
 router.post("/seed", TodoController.seedTodos);
 
+router.post("/draft", TodoController.draftTodos);
+
 router.post("/create", TodoController.createTodo);
 
 router.put("/:id", TodoController.updateTodo);

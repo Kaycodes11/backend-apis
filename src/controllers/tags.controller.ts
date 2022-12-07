@@ -1,12 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import Tags from "../models/tags.model";
 import Todo, { ITodo } from "../models/todo.model";
+import { seedTags } from "../seeds/tags";
 
 export const seedTagOrTags = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const saveTags = await Tags.insertMany(seedTags);
+    res.status(201).json(saveTags);
+  } catch (e: any) {
+    next(e);
+  }
+};
 export const createTagOrTags = async (
   req: Request,
   res: Response,

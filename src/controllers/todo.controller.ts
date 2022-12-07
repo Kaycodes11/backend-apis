@@ -1,15 +1,39 @@
 import { Request, Response, NextFunction } from "express";
-import createHttpError from "http-errors";
-import Todo, { ITodo } from "../models/todo.model";
+import Todo, { ITodo, TodoStatus } from "../models/todo.model";
 import Tags, { ITags } from "../models/tags.model";
+import { seedMockTodosData } from "../seeds/todos";
 
 // https://www.youtube.com/@WebDevJourney/playlists
 // https://www.youtube.com/watch?v=3KYKXsnMpAo&list=PLivfVBKXLkx_1VKrqHv4K6sKIoWTEVlJ9&index=1&ab_channel=Code%26bird
+
 export const seedTodos = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const todos = await Todo.insertMany(seedMockTodosData);
+    res.json(todos).status(201);
+  } catch (e: any) {
+    next(e);
+  }
+};
+
+export const draftTodos = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const newTodo = new Todo(req.body);
+  newTodo.status = TodoStatus.DRAFTED;
+
+  try {
+    const draftTodo = await newTodo.save();
+    res.status(201).json(draftTodo);
+  } catch (e: any) {
+    next({ status: e.status || 500, message: e.message });
+  }
+};
 
 // helper function (if needed)
 export const addTagToTodo = function (todoId: string, tag: ITags) {
@@ -40,7 +64,6 @@ export const createTodo = async (
     const saveTodo = await newTodo.save();
     res.status(201).json(saveTodo);
   } catch (e: any) {
-    console.log(new createHttpError["400"]("Bad request"));
     next({ status: e.status || 500, message: e.message });
   }
 };
@@ -61,8 +84,8 @@ export const getTodo = async (
   next: NextFunction
 ) => {
   try {
-    const todo = await Todo.findById(req.params.id).populate("tags") ?? {};
-      res.send(todo).status(200);
+    const todo = await Todo.findById(req.params.id).populate("tags");
+    res.send(todo).status(200);
   } catch (e: any) {
     next(e);
   }

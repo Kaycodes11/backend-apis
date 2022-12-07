@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 
 
-enum TodoStatus {
+export enum TodoStatus {
   DRAFTED = "DRAFTED",
   CREATED = "CREATED",
   PUBLISHED = "PUBLISHED",
