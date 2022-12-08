@@ -18,7 +18,6 @@ interface IUser {
   avatar?: string;
   meta?: Meta;
   refreshTokens?: Array<string>;
-  roles?: Array<string> | Array<null>;
 }
 
 // Put all user instance methods in this interface:

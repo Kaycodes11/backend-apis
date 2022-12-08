@@ -47,6 +47,8 @@ const TodoSchema = new Schema<ITodo>({
   tags: [{type: Schema.Types.ObjectId, ref: "Tags"}],
 }, {timestamps: true});
 
+// https://mongoosejs.com/docs/queries.html
+
 const Todo = model<ITodo>("Todo", TodoSchema);
 
 // this is how to set a new to do and tags's value is a Map

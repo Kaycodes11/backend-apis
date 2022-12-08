@@ -3,6 +3,8 @@ import * as TodoController from "../controllers/todo.controller";
 
 const router = Router();
 
+router.get("/", TodoController.getTodos);
+
 router.post("/seed", TodoController.seedTodos);
 
 router.post("/draft", TodoController.draftTodos);
@@ -15,6 +17,6 @@ router.delete("/:id", TodoController.deleteTodo);
 
 router.get("/:id", TodoController.getTodo);
 
-router.get("/", TodoController.getTodos);
+
 
 export default router;

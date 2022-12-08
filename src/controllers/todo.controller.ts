@@ -71,12 +71,40 @@ export const updateTodo = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const todo = await Todo.findById(req.params.id).orFail();
+    if (!todo) return next({ status: 400, message: "No such todo found" });
+
+    // whatever value user given take it and update it by req.params.id
+    const updateTodo = await Todo.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    );
+
+    res.status(200).json({ ...updateTodo });
+  } catch (e: any) {
+    next(e);
+  }
+};
 export const deleteTodo = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const todo = await Todo.findById(req.params.id).orFail();
+    if (!todo) return next({ status: 400, message: "No such todo found" });
+
+    // whatever value user given take it and delete it by req.params.id
+    const updateTodo = await Todo.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ ...updateTodo });
+  } catch (e: any) {
+    next(e);
+  }
+};
 
 export const getTodo = async (
   req: Request,
@@ -94,4 +122,12 @@ export const getTodos = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  // pagination, filter by date, time, status, tag
+  try {
+    const todos = await Todo.find().populate("tags");
+    res.status(200).json(todos);
+  } catch (e) {
+    next(e);
+  }
+};
