@@ -1,57 +1,47 @@
 import { model, Schema } from "mongoose";
 
-
 export enum TodoStatus {
   DRAFTED = "DRAFTED",
   CREATED = "CREATED",
   PUBLISHED = "PUBLISHED",
   UPDATED = "UPDATED",
   ARCHIVED = "ARCHIVED",
-
 }
-
-type Tags = { tagId: string, tagName: string | string[]};
-type TagsKeys = keyof Tags;
-
-
-// here, make an interface representing this document in mongodb
 
 export interface ITodo {
-  _id?: Schema.Types.ObjectId,
+  _id?: Schema.Types.ObjectId;
   title: string;
   desc: string;
-  // tags: Map<TagsKeys, Tags>;
-  tags: Schema.Types.ObjectId;
-  thumbnail?: string
-  // status: { [key: string]: string };
-  status: TodoStatus
+  tags?: Schema.Types.ObjectId;
+  thumbnail?: string;
+  status: TodoStatus;
 }
 
-// interface ITodoWithSocial extends ITodo, Document {}
+const TodoSchema = new Schema<ITodo>(
+  {
+    title: { type: String, required: true },
+    desc: { type: String, required: true },
+    status: {
+      type: String,
+      required: true,
+      default: TodoStatus.CREATED,
+      enum: TodoStatus,
+    },
+    tags: [{ type: Schema.Types.ObjectId, ref: "Tags" }],
+  },
+  { timestamps: true }
+);
 
-// make schema based on the document shape
+TodoSchema.pre(/^find/, async function (next) {
+  // this here refers to query object & when this document/ i.e. this model's instance uses any query that starts with "find"
+  // then it will add where to that query to filter out the result
+  return this.where({ isDeleted: false });
+});
 
-const TodoSchema = new Schema<ITodo>({
-  title: { type: String, required: true },
-  desc: { type: String, required: true },
-  // tags: {
-  //   type: Map,
-  //   of: {
-  //     tagId: { type: String, required: true },
-  //     tagTitle:{ type: String, required: true },
-  //   },
-  //   https://stackoverflow.com/questions/56398873/type-checking-in-mongoose-maps
-  //   default: null
-  // },
-  status: {type: String, required: true, default: TodoStatus.CREATED, enum: TodoStatus},
-  tags: [{type: Schema.Types.ObjectId, ref: "Tags"}],
-}, {timestamps: true});
-
-// https://mongoosejs.com/docs/queries.html
+// TodoSchema.query.paginate = async function(limit = 2, pageNo = 1) {
+//   return this.skip(limit * (pageNo - 1)).limit(limit)
+// };
 
 const Todo = model<ITodo>("Todo", TodoSchema);
-
-// this is how to set a new to do and tags's value is a Map
-// new Todo({title: "Todo 1", desc: "todo desc", tags: { 'tagId': "todo1", 'tagTitle': "todo tag" } });
 
 export default Todo;

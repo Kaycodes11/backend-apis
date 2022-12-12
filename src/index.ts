@@ -33,6 +33,7 @@ app.use("/throw", (req: Request, res: Response, next: NextFunction) => {
 
 app.use(AllRoutes);
 
+// whenever any argument given to next(); that's assumed to be error, that's how next(...) comes to errorHandler
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   res.send({ status: err.status, message: err.message });
 };
@@ -41,7 +42,9 @@ app.use(errorHandler);
 
 function init() {
   try {
-    db().then(() => console.log("database has successfully connected")).catch(error => console.error(error));
+    db()
+      .then(() => console.log("database has successfully connected"))
+      .catch((error) => console.error(error));
     const server: Server = app.listen(PORT, (): void => {
       console.log(`server started on the ${PORT}`);
     });

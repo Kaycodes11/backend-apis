@@ -40,19 +40,70 @@ export const updateTagOrTags = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  // ## Update Validators Only Runs For Some methods: $set, $unset, $push, $addToSet, $pull, $pullAll
+  try {
+    // const unset = {$unset : {title: 1, updatedAt: 1}}; // when updating these files are mandatory
+    // const push = { $push: [{ title: "React" }, { title: "Angular" }] };
+    // const set = { $set: req.body };
+
+    // const addToSet = { $addToSet: { title: ["4", "5"] } }; // the field must be an array, e.g. value ["1", "2"] then now ["1", "2", ["4", "5"] ]
+
+    // const addToSet = { $addToSet: { title: {$each: ["4", "2", "1", "5"]} } }; // ["1", "2"]: after $addToSet => ["1", "2", "4", "5"]
+
+    // const addToSet = { $addToSet: { title: "4", } }; // the field must be an array with value ["1", "2"] then now ["1", "2", "4" ]
+
+    // const addToSet = { $addToSet: { title: "2", } }; // the does nothing as title field has value of 2 already
+
+    // const push = { $push: { title: "Angular" } };
+
+    // const push ={title: "React"}, { $push: { title: { $each: ["React", "Angular"] } } }, {new: true};
+
+    // sort array as descending order and then keep only first two sorted elements
+    // const push = { _id: 5 }, { $push: { quizzes: { $each: [ { wk: 5, score: 8 }, { wk: 6, score: 7 }, { wk: 7, score: 6 } ], $sort: { score: -1 }, $slice: 3 } }}
+
+    const updateTag = await Tags.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true, runValidators: true }
+    );
+    res.json(updateTag).status(200);
+  } catch (e) {
+    next(e);
+  }
+};
 export const deleteTagOrTags = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    await Tags.findByIdAndDelete(req.params.id);
+  } catch (e) {
+    next(e);
+  }
+};
 export const getTag = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const tag = await Tags.findById(req.params.id);
+    res.status(200).json(tag);
+  } catch (e) {
+    next(e);
+  }
+};
 export const getTags = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  try {
+    const tags = await Tags.find();
+    res.status(200).json(tags);
+  } catch (e) {
+    next(e);
+  }
+};
