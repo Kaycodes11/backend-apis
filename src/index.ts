@@ -36,7 +36,7 @@ app.use(AllRoutes);
 
 // whenever any argument given to next(); that's assumed to be error, that's how next(...) comes to errorHandler
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  res.send({ status: err.status, message: err.message });
+  res.send({ status: err.status || 500, message: err.message });
 };
 
 app.use(errorHandler);

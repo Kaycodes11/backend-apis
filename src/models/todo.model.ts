@@ -16,8 +16,6 @@ export enum TodoStatus {
   NONE = "NONE",
 }
 
-// https://stackoverflow.com/questions/41308123/map-typescript-enum
-
 export interface ITodo {
   _id?: Schema.Types.ObjectId;
   title: string;
@@ -90,25 +88,46 @@ type Paginate = {
   limit?: number;
 };
 
-// Equivalent to `TodoModel.find({}).skip().limit().sort()`
-// await TodoModel.find({}).paginate('mongoose');
+// Equivalent to `TodoModel.find({}).skip().limit().sort()` or await TodoModel.find({}).paginate('mongoose');
 TodoSchema.query.paginate = function paginate<T extends string | Paginate>(
   this: QueryWithHelpers<any, HydratedDocument<ITodo>, TodoQueryHelpers>,
   page: T extends string ? never : T
 ) {
-  // skip = 10 * 1 - 10 or 10 * ( 1 - 1)
+  page.pageNo = page.pageNo || 1;
+  page.size = page.size || 10;
+
+  console.log(
+    "query object i.e. mongoose document: ",
+    "QUERY",
+    this.getQuery(),
+    "FILTER",
+    this.getFilter(),
+    "PopulatePath",
+    this.getPopulatedPaths()
+  );
+
+  // even if this.find({}) is an {}; it won't reset / overwrite previous filters from elsewhere so extra options/queries can be added below
   return this.find({})
     .skip(page.size * page.pageNo - page.size)
-    .limit(page.size)
-    .sort({ createdAt: -1 });
+    .limit(page.size);
 };
 
 // since here returning a Promise so no need to use async keyword
 TodoSchema.query.byStatus = function byStatus<T = any>(
   this: QueryWithHelpers<any, HydratedDocument<ITodo>, TodoQueryHelpers>,
-  status: TodoStatus | keyof typeof TodoStatus
+  status: keyof typeof TodoStatus | ""
 ) {
-  return this.find({ status: TodoStatus[status] });
+  // https://stackoverflow.com/questions/54044420/how-do-i-build-a-dynamic-query-in-mongoose = building query with $and $or
+  const query = {} as { status: typeof status | typeof status[] };
+
+  if (typeof status === "string" && status.length) {
+    query.status = status;
+  } else if (Array.isArray(status) && status.length) {
+    // @ts-ignore
+    query.status = { $in: status };
+  }
+  // console.log("query", query);
+  return this.find(query);
 };
 
 const Todo = model<ITodo, TodoModelType>("Todo", TodoSchema);
