@@ -101,16 +101,24 @@ export const getTags = async (
   res: Response,
   next: NextFunction
 ) => {
-  const startDate = moment('2022-12-12T15:20:15.065Z').utcOffset('+0530').format("YYYY-MM-DD hh:mm:ss");
-  const updateDate = moment("2022-12-26T15:20:15.065Z").utcOffset('+0530').format("YYYY-MM-DD hh:mm:ss");
+  const startDate = moment("2022-12-22T15:02:15.203Z")
+    .utcOffset("+0530")
+    .format("YYYY-MM-DD");
+  const updateDate = moment("2022-12-31T15:02:15.203Z")
+    .utcOffset("+0530")
+    .format("YYYY-MM-DD");
 
   console.log(startDate, updateDate);
 
+  // so when filtering date it has to be iso like '2022-12-24T15:20:15.065Z' then use it as it is or transform using moment then filter as below
+
   try {
-    const tags = await Tags.find().where({
-      createdAt: { $gte: startDate },
-      updatedAt: { $lt: updateDate },
-    }).select("-__v");
+    const tags = await Tags.find()
+      .where({
+        createdAt: { $gte: startDate },
+        updatedAt: { $lte: updateDate },
+      })
+      .select("-__v");
     res.status(200).json(tags);
   } catch (e) {
     next(e);
