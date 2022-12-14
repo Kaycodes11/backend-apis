@@ -29,7 +29,7 @@ interface ITaskMethods {
 
 // statics
 
-interface TaskModel extends Model<Task, TaskQueryHelpers, ITaskMethods> {
+interface TaskModelType extends Model<Task, TaskQueryHelpers, ITaskMethods> {
   randomId(toStringNo: string): Promise<string>;
 }
 
@@ -62,7 +62,7 @@ TaskSchema.query.byName = function byName(
 };
 
 // 2nd param to `model()` is the Model class to return.
-const TaskModel = model<Task, TaskModel>("Task", TaskSchema);
+const TaskModel = model<Task, TaskModelType>("Task", TaskSchema);
 
 
 

@@ -113,6 +113,7 @@ export const getTodo = async (
 ) => {
   try {
     const todo = await Todo.findById(req.params.id).populate("tags");
+    console.log(todo);
     res.send(todo).status(200);
   } catch (e: any) {
     next(e);
@@ -123,9 +124,32 @@ export const getTodos = async (
   res: Response,
   next: NextFunction
 ) => {
-  // pagination, filter by date, time, status, tag
+  const { status, size, pageNo } = req.query;
+
+  // console.log(String(TodoStatus.CREATED).toLowerCase() === "created");
+  // console.log(Object.keys(TodoStatus) as Array<keyof typeof TodoStatus>);
+
+  const statusKey =
+    (Object.keys(TodoStatus) as Array<keyof typeof TodoStatus>).find(
+      (elem) => elem.toLowerCase() === status
+    ) ?? TodoStatus.NONE;
+  console.log(TodoStatus[statusKey]);
+
+  // pagination = done, filterByDateOrTime = ?, filterByStatus = done, filterByTag
+  // add virtual to format date using moment on Todo model
+
   try {
-    const todos = await Todo.find().populate("tags");
+    // populate run its document (here Tags) after the main document (here Todo) then merges the result with Todos response
+    // so with populate it does run extra query for itself
+    const todos = await Todo.find({
+      // where: { tags: { $eq: [] } },
+    })
+      .populate({ path: "tags", match: { title: /untitled/i } })
+      // @ts-ignore
+      .paginate({ pageNo: 1, size: 2 })
+      .byStatus(TodoStatus[statusKey]);
+
+    // when used orFail it will send status: 200 along with a message, without orFail the not found document(s) response either null or []
     res.status(200).json(todos);
   } catch (e) {
     next(e);

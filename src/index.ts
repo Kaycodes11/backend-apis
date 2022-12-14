@@ -10,6 +10,7 @@ import db from "./database";
 import AllRoutes from "./routes";
 import { config } from "dotenv";
 import createHttpError from "http-errors";
+// import moment from "moment";
 
 const app: Application = express();
 
@@ -39,6 +40,17 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 };
 
 app.use(errorHandler);
+
+// console.log(moment(Date.now()).utcOffset('+0530').format("YYYY-MM-DD HH:mm:ss")); // here '+0530' is indian utc offset
+//
+// console.log(moment(Math.floor(new Date().valueOf())).utcOffset('+0530').format("YYYY-MM-DD HH:mm A Z")); // working
+//
+// console.log("unix", moment('2022-12-12T15:21:02.224Z').utcOffset("+0530").unix() ); // unix timestamp
+//
+// console.log("db", moment('2022-12-12T15:21:02.224Z').utcOffset("+0530").format("YYYY-MM-DD HH:mm:ss A Z") );
+//
+// const offset = moment(Math.floor(new Date().valueOf())).add("-11.00", "days"); // this is 2days before at the same time
+// console.log(moment(offset, 'h:mm:ss A zz')); // working
 
 function init() {
   try {
