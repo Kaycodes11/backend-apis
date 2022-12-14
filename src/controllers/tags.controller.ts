@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import Tags from "../models/tags.model";
 import Todo, { ITodo } from "../models/todo.model";
 import { seedTags } from "../seeds/tags";
+import moment from "moment";
 
 export const seedTagOrTags = async (
   req: Request,
@@ -100,8 +101,16 @@ export const getTags = async (
   res: Response,
   next: NextFunction
 ) => {
+  const startDate = moment('2022-12-12T15:20:15.065Z').utcOffset('+0530').format("YYYY-MM-DD hh:mm:ss");
+  const updateDate = moment("2022-12-26T15:20:15.065Z").utcOffset('+0530').format("YYYY-MM-DD hh:mm:ss");
+
+  console.log(startDate, updateDate);
+
   try {
-    const tags = await Tags.find();
+    const tags = await Tags.find().where({
+      createdAt: { $gte: startDate },
+      updatedAt: { $lt: updateDate },
+    }).select("-__v");
     res.status(200).json(tags);
   } catch (e) {
     next(e);

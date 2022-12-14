@@ -154,3 +154,5 @@ export const getTodos = async (
     next(e);
   }
 };
+
+// transaction = https://stackoverflow.com/questions/67044636/what-type-is-mongoose-startsession-in-typescript

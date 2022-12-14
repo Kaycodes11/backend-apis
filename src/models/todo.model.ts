@@ -75,7 +75,15 @@ const TodoSchema = new Schema<
 // return this.where({ isDeleted: false });
 // });
 
+// iso format = '2022-12-14T13:28:49.194Z'; to unix = new Date('2022-12-14T13:28:49.194Z').valueOf()
+// similarly, unix to iso format = new Date(1671024529194).toISOString()
 TodoSchema.virtual("startDate").get(function (this: HydratedDocument<ITodo>) {
+  // moment(new Date('2022-12-14T13:28:49.194Z').valueOf()).utcOffset("dynamic").unix();
+  return moment(Math.floor(new Date().valueOf()))
+    .utcOffset("+0530")
+    .format("YYYY-MM-DD HH:mm A Z");
+});
+TodoSchema.virtual("updatedDate").get(function (this: HydratedDocument<ITodo>) {
   return moment(Math.floor(new Date().valueOf()))
     .utcOffset("+0530")
     .format("YYYY-MM-DD HH:mm A Z");
