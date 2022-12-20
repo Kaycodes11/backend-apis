@@ -3,10 +3,8 @@ import {Strategy} from 'passport-local';
 import {User} from "../models/user.model";
 import {Request} from "express";
 
-// with session while it needs a bit manual work by adding a custom property on request.session
-// basically passport does that same thing using the session object
-
-
+// mainly, serialize & deserialize works with session (express-session) data, so unless using session-based no need to serialize & deserialize
+// when it serializes as seen it save the data with `req.session` which utilizes express-session's store (memory or db)
 passport.serializeUser((user: any, done) => {
     // now passport takes user data that assigned to req.user from local Strategy
     console.log(`serializedUser: `, user);
@@ -15,6 +13,7 @@ passport.serializeUser((user: any, done) => {
 });
 
 
+// when deserializing as seen it gets the data from session and do something
 passport.deserializeUser(async (id, done) => {
     console.log(`deserializedUser: `, id);
     // it takes the id from when its serialized req.session.passport.user; then using that id query database;

@@ -39,7 +39,7 @@ app.use("/images", express.static(path.join(__dirname, "/images"))); // /images/
 app.use(cookieParser());
 
 // session store data at server & this data only accessible through api at frontend not within the browser like normal cookie
-// noinspection SpellCheckingInspection
+// to add data to req.session, this express-session package will be absolutely needed & store could memoryStore or database session store
 app.use(
     session({
         secret: "AGDSGDSGDSHGDFHFDHFDHDF",
@@ -50,7 +50,7 @@ app.use(
 );
 
 app.use(passport.initialize());
-// app.use(passport.session());
+// app.use(passport.session()); // this middleware handles serializing & deserializing of session data
 
 LocalPassport();
 JwtStrategy();
